@@ -1,13 +1,12 @@
 from lib import text2dimacs
 import subprocess
-import os
+
 import tkinter as tk
 from pathlib import Path
 import shutil
-import time
 
 
-class Sokoban():
+class Sokoban:
 
     def __init__(self):
         self.limit = 23
@@ -16,11 +15,9 @@ class Sokoban():
         self.map_name = self.choose_map()
         self.map = self.load_map(self.map_name)
         self.x1S = 1
-        self.x1E = len(self.map)-1
+        self.x1E = len(self.map) - 1
         self.y1S = 1
-        self.y1E = len(self.map[0])-2
-
-
+        self.y1E = len(self.map[0]) - 2
 
     def choose_map(self):
         maps = ["map1.txt", "map8.txt", "map4.txt", "map5.txt", "map6.txt", "map7.txt"]
@@ -37,10 +34,10 @@ class Sokoban():
         print()
         print("Vyber si číslo mapy, ktorá sa má riešiť:")
         input_chossen_map = input()
-        return maps[int(input_chossen_map)-1].split(".")[0]
+        return maps[int(input_chossen_map) - 1].split(".")[0]
 
     def load_map(self, map_name):
-        with open("maps/"+map_name+".txt") as f:
+        with open("maps/" + map_name + ".txt") as f:
             lines = f.readlines()
         return lines
 
@@ -97,11 +94,9 @@ class Sokoban():
                             if (n[0] == "move" or n[0] == "push"):
                                 p = n[1].split(",")[4].split(")")[0]
                                 moves[p] = pom[1]
-        #file = open("results/" + self.map_name + "/output" + ".txt", "w")
         out_path = dirpath / 'output.txt'
 
         print()
-        print("Kroky riešenia v CNF:")
         with out_path.open("w", encoding="utf-8") as f:
             for move in range(len(moves)):
                 f_move = str(move + 1) + ". " + moves[str(move + 1)]
@@ -111,17 +106,21 @@ class Sokoban():
         self.animation(moves)
 
     def animation(self, moves):
-
         self.mapV = []
         for i in self.map:
             self.mapV.append(list(i.replace('\n', '')))
-
+            if len(self.mapV[len(self.mapV) - 1]) < len(self.mapV[0]):
+                self.mapV[len(self.mapV) - 1].append(" ")
 
         root = tk.Tk()
         canvas = tk.Canvas(root, width=len(self.mapV[0]) * 75 + 50, height=len(self.mapV) * 75 + 50)
         canvas.pack()
 
         for i in range(len(moves)):
+            canvas.delete("all")
+            self.print_map(canvas)
+            root.update()
+            root.after(1300)
             cl = moves[str(i + 1)]
             action = cl.strip().split('(')[0]
             cord = cl.strip().split('(')[1].split(',')
@@ -143,12 +142,10 @@ class Sokoban():
                     dx = 1
                 if int(cord[0]) > int(cord[2]):
                     dx = -1
-                if int(cord[0]) < int(cord[2]):
+                if int(cord[1]) < int(cord[3]):
                     dy = 1
-                if int(cord[0]) < int(cord[2]):
+                if int(cord[1]) > int(cord[3]):
                     dy = -1
-
-
 
                 if self.mapV[int(cord[0])][int(cord[1])] == "S":
                     self.mapV[int(cord[0])][int(cord[1])] = " "
@@ -159,27 +156,23 @@ class Sokoban():
                 if self.mapV[int(cord[2])][int(cord[3])] == "c":
                     self.mapV[int(cord[2])][int(cord[3])] = "s"
 
-
                 if self.mapV[int(cord[2]) + dx][int(cord[3]) + dy] == " ":
                     self.mapV[int(cord[2]) + dx][int(cord[3]) + dy] = "C"
                 if self.mapV[int(cord[2]) + dx][int(cord[3]) + dy] == "X":
                     self.mapV[int(cord[2]) + dx][int(cord[3]) + dy] = "c"
-
-                canvas.delete("all")
-                self.print_map(canvas)
-                time.sleep(1)
-
-
-
-
+        canvas.delete("all")
+        self.print_map(canvas)
+        root.update()
+        root.after(1300)
         root.mainloop()
 
     def print_map(self, canvas):
         for x in range(len(self.mapV)):
             for y in range(len(self.mapV[0])):
                 if self.mapV[x][y] == '#':
-                    canvas.create_rectangle(y * 75 + 25, x * 75 + 25, y * 75 + 100, x * 75 + 100, outline="black", fill="grey")
-                    canvas.create_text(y * 75 + 65, x * 75 + 65, text="#", font=('Helvetica','50','bold'))
+                    canvas.create_rectangle(y * 75 + 25, x * 75 + 25, y * 75 + 100, x * 75 + 100, outline="black",
+                                            fill="grey")
+                    canvas.create_text(y * 75 + 65, x * 75 + 65, text="#", font=('Helvetica', '50', 'bold'))
                 elif self.mapV[x][y] == 'S':
                     canvas.create_rectangle(y * 75 + 25, x * 75 + 25, y * 75 + 100, x * 75 + 100, outline="black",
                                             fill="turquoise")
@@ -329,7 +322,7 @@ class Sokoban():
                         CNF_clauses.append(f"-push({x1},{y1},{x1},{y1 + 1},{i}) v at(C,{x1},{y1 + 2},{i})")
                         CNF_clauses.append(f"-push({x1},{y1},{x1},{y1 + 1},{i}) v -at(C,{x1},{y1 + 2},{i - 1})")
 
-        #TRIGGERING
+        # TRIGGERING
         pom = 0
         CNF_clauses.append(f"c At least one")
         for i in range(1, self.iteracia):
@@ -352,20 +345,26 @@ class Sokoban():
         for act in self.listOfActions:
             for act2 in self.listOfActions:
                 if act != act2:
-                    if act[5] == act2[5] and (act[1] == act2[1] and act[2] == act2[2] and act[3] == act2[3] and act[4] == act2[4]) == False:
+                    if act[5] == act2[5] and (
+                            act[1] == act2[1] and act[2] == act2[2] and act[3] == act2[3] and act[4] == act2[
+                        4]) == False:
                         if act[0] == 0:
                             if act2[0] == 0:
-                                CNF_clauses.append(f"-move({act[1]},{act[2]},{act[3]},{act[4]},{act[5]}) v -move({act2[1]},{act2[2]},{act2[3]},{act2[4]},{act2[5]})")
+                                CNF_clauses.append(
+                                    f"-move({act[1]},{act[2]},{act[3]},{act[4]},{act[5]}) v -move({act2[1]},{act2[2]},{act2[3]},{act2[4]},{act2[5]})")
                             else:
-                                CNF_clauses.append(f"-move({act[1]},{act[2]},{act[3]},{act[4]},{act[5]}) v -push({act2[1]},{act2[2]},{act2[3]},{act2[4]},{act2[5]})")
+                                CNF_clauses.append(
+                                    f"-move({act[1]},{act[2]},{act[3]},{act[4]},{act[5]}) v -push({act2[1]},{act2[2]},{act2[3]},{act2[4]},{act2[5]})")
                         else:
                             if act2[0] == 0:
-                                CNF_clauses.append(f"-push({act[1]},{act[2]},{act[3]},{act[4]},{act[5]}) v -move({act2[1]},{act2[2]},{act2[3]},{act2[4]},{act2[5]})")
+                                CNF_clauses.append(
+                                    f"-push({act[1]},{act[2]},{act[3]},{act[4]},{act[5]}) v -move({act2[1]},{act2[2]},{act2[3]},{act2[4]},{act2[5]})")
                             else:
-                                CNF_clauses.append(f"-push({act[1]},{act[2]},{act[3]},{act[4]},{act[5]}) v -push({act2[1]},{act2[2]},{act2[3]},{act2[4]},{act2[5]})")
+                                CNF_clauses.append(
+                                    f"-push({act[1]},{act[2]},{act[3]},{act[4]},{act[5]}) v -push({act2[1]},{act2[2]},{act2[3]},{act2[4]},{act2[5]})")
 
         ##BACKGROUND
-       ## file.write("c Background\n")
+        ## file.write("c Background\n")
         ##file.write("c Player box and wall cant be on same place\n")
         CNF_clauses.append(f"c Background")
         CNF_clauses.append(f"c Player box and wall cant be on same place")
@@ -436,7 +435,6 @@ class Sokoban():
                     CNF_clauses.append(cl)
                     cl = ""
         return CNF_clauses
-
 
 
 s = Sokoban()

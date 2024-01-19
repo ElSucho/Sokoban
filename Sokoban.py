@@ -4,6 +4,7 @@ import os
 import tkinter as tk
 from pathlib import Path
 import shutil
+import time
 
 
 class Sokoban():
@@ -110,28 +111,97 @@ class Sokoban():
         self.animation(moves)
 
     def animation(self, moves):
+
+        self.mapV = []
+        for i in self.map:
+            self.mapV.append(list(i.replace('\n', '')))
+
+
+        root = tk.Tk()
+        canvas = tk.Canvas(root, width=len(self.mapV[0]) * 75 + 50, height=len(self.mapV) * 75 + 50)
+        canvas.pack()
+
         for i in range(len(moves)):
             cl = moves[str(i + 1)]
             action = cl.strip().split('(')[0]
             cord = cl.strip().split('(')[1].split(',')
 
-        w = len(self.map)
-        h = len(self.map[0].replace('\n', ''))
+            if action == "move":
+                if self.mapV[int(cord[0])][int(cord[1])] == "S":
+                    self.mapV[int(cord[0])][int(cord[1])] = " "
+                elif self.mapV[int(cord[0])][int(cord[1])] == "s":
+                    self.mapV[int(cord[0])][int(cord[1])] = "X"
+                if self.mapV[int(cord[2])][int(cord[3])] == "X":
+                    self.mapV[int(cord[2])][int(cord[3])] = "s"
+                elif self.mapV[int(cord[2])][int(cord[3])] == " ":
+                    self.mapV[int(cord[2])][int(cord[3])] = "S"
 
-        root = tk.Tk()
-        canvas = tk.Canvas(root, width=h * 75 + 50, height=w * 75 + 50)
-        canvas.pack()
+            if action == "push":
+                dx = 0
+                dy = 0
+                if int(cord[0]) < int(cord[2]):
+                    dx = 1
+                if int(cord[0]) > int(cord[2]):
+                    dx = -1
+                if int(cord[0]) < int(cord[2]):
+                    dy = 1
+                if int(cord[0]) < int(cord[2]):
+                    dy = -1
 
-        for x in range(h):
-            for y in range(w):
-                if self.map[x][y] == '#':
-                    canvas.create_rectangle(x * 75 + 25, y * 75 + 25, x * 75 + 100, y * 75 + 100, outline="black", fill="red")
-                else:
-                    canvas.create_rectangle(x * 75 + 25, y * 75 + 25, x * 75 + 100, y * 75 + 100, outline="black")
+
+
+                if self.mapV[int(cord[0])][int(cord[1])] == "S":
+                    self.mapV[int(cord[0])][int(cord[1])] = " "
+                if self.mapV[int(cord[2])][int(cord[3])] == "C":
+                    self.mapV[int(cord[2])][int(cord[3])] = "S"
+                if self.mapV[int(cord[0])][int(cord[1])] == "s":
+                    self.mapV[int(cord[0])][int(cord[1])] = "X"
+                if self.mapV[int(cord[2])][int(cord[3])] == "c":
+                    self.mapV[int(cord[2])][int(cord[3])] = "s"
+
+
+                if self.mapV[int(cord[2]) + dx][int(cord[3]) + dy] == " ":
+                    self.mapV[int(cord[2]) + dx][int(cord[3]) + dy] = "C"
+                if self.mapV[int(cord[2]) + dx][int(cord[3]) + dy] == "X":
+                    self.mapV[int(cord[2]) + dx][int(cord[3]) + dy] = "c"
+
+                canvas.delete("all")
+                self.print_map(canvas)
+                time.sleep(1)
+
+
+
 
         root.mainloop()
 
-
+    def print_map(self, canvas):
+        for x in range(len(self.mapV)):
+            for y in range(len(self.mapV[0])):
+                if self.mapV[x][y] == '#':
+                    canvas.create_rectangle(y * 75 + 25, x * 75 + 25, y * 75 + 100, x * 75 + 100, outline="black", fill="grey")
+                    canvas.create_text(y * 75 + 65, x * 75 + 65, text="#", font=('Helvetica','50','bold'))
+                elif self.mapV[x][y] == 'S':
+                    canvas.create_rectangle(y * 75 + 25, x * 75 + 25, y * 75 + 100, x * 75 + 100, outline="black",
+                                            fill="turquoise")
+                    canvas.create_text(y * 75 + 65, x * 75 + 65, text="S", font=('Helvetica', '50', 'bold'))
+                elif self.mapV[x][y] == 'C':
+                    canvas.create_rectangle(y * 75 + 25, x * 75 + 25, y * 75 + 100, x * 75 + 100, outline="black",
+                                            fill="red")
+                    canvas.create_text(y * 75 + 65, x * 75 + 65, text="C", font=('Helvetica', '50', 'bold'))
+                elif self.mapV[x][y] == 'X':
+                    canvas.create_rectangle(y * 75 + 25, x * 75 + 25, y * 75 + 100, x * 75 + 100, outline="black",
+                                            fill="orange")
+                    canvas.create_text(y * 75 + 65, x * 75 + 65, text="X", font=('Helvetica', '50', 'bold'))
+                elif self.mapV[x][y] == 's':
+                    canvas.create_rectangle(y * 75 + 25, x * 75 + 25, y * 75 + 100, x * 75 + 100, outline="black",
+                                            fill="turquoise")
+                    canvas.create_text(y * 75 + 65, x * 75 + 65, text="s", font=('Helvetica', '50', 'bold'))
+                elif self.mapV[x][y] == 'c':
+                    canvas.create_rectangle(y * 75 + 25, x * 75 + 25, y * 75 + 100, x * 75 + 100, outline="black",
+                                            fill="green")
+                    canvas.create_text(y * 75 + 65, x * 75 + 65, text="c", font=('Helvetica', '50', 'bold'))
+                else:
+                    canvas.create_rectangle(y * 75 + 25, x * 75 + 25, y * 75 + 100, x * 75 + 100, outline="black")
 
     def CNF(self):
         CNF_clauses = []
@@ -366,6 +436,7 @@ class Sokoban():
                     CNF_clauses.append(cl)
                     cl = ""
         return CNF_clauses
+
 
 
 s = Sokoban()

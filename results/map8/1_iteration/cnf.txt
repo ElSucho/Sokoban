@@ -1,3 +1,6 @@
+c Actions
+c move(x1,y1,x2,y2,i)
+c push(x1,y1,x2,y2,i)
 c Initial/Goal State
 -at(C,0,0,0)
 -at(C,0,1,0)
@@ -8,6 +11,7 @@ at(#,0,4,0)
 -at(C,0,6,0)
 -at(C,0,7,0)
 -at(C,0,8,0)
+c FRAME
 -at(C,1,0,0)
 -at(C,1,1,0)
 -at(C,1,2,0)
@@ -17,6 +21,7 @@ at(#,1,5,0)
 -at(C,1,6,0)
 -at(C,1,7,0)
 -at(C,1,8,0)
+c FRAME
 -at(C,2,0,0)
 -at(C,2,1,0)
 at(#,2,2,0)
@@ -26,6 +31,7 @@ at(#,2,2,0)
 at(#,2,6,0)
 -at(C,2,7,0)
 -at(C,2,8,0)
+c FRAME
 -at(C,3,0,0)
 at(#,3,1,0)
 -at(C,3,2,0)
@@ -34,6 +40,7 @@ at(#,3,1,0)
 -at(C,3,5,0)
 -at(C,3,6,0)
 at(#,3,7,0)
+c FRAME
 at(#,4,0,0)
 -at(C,4,1,0)
 -at(C,4,2,0)
@@ -46,6 +53,7 @@ at(c,4,3,0)
 -at(C,4,6,0)
 -at(C,4,7,0)
 at(#,4,8,0)
+c FRAME
 at(#,5,0,0)
 -at(C,5,1,0)
 at(S,5,2,0)
@@ -55,6 +63,7 @@ at(C,5,4,0)
 -at(C,5,6,0)
 -at(C,5,7,0)
 at(#,5,8,0)
+c FRAME
 at(#,6,0,0)
 -at(C,6,1,0)
 -at(C,6,2,0)
@@ -64,6 +73,7 @@ at(#,6,0,0)
 -at(C,6,6,0)
 -at(C,6,7,0)
 at(#,6,8,0)
+c FRAME
 at(#,7,0,0)
 at(#,7,1,0)
 at(#,7,2,0)
@@ -73,9 +83,7 @@ at(#,7,5,0)
 at(#,7,6,0)
 at(#,7,7,0)
 at(#,7,8,0)
-c Actions
-c move(x1,y1,x2,y2,i)
-c push(x1,y1,x2,y2,i)
+c FRAME
 c At least one
 c Mutually exclusive
 c Background
@@ -1887,4 +1895,3 @@ c Player can be only on one place
 -at(S,6,7,0) v -at(S,6,4,0)
 -at(S,6,7,0) v -at(S,6,5,0)
 -at(S,6,7,0) v -at(S,6,6,0)
-c FRAME
